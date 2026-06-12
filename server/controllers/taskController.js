@@ -1,9 +1,16 @@
+const Task = require('../models/Task');
 const mockDb = require('../config/mockDb');
+const db = require('../config/db');
+
+// Helper to determine if we should use MongoDB or fall back to mockDb
+const useMongo = () => db.getStatus();
 
 // Get all tasks
 exports.getAllTasks = async (req, res) => {
   try {
-    const tasks = await mockDb.findAll();
+    const tasks = useMongo()
+      ? await Task.find().lean()
+      : await mockDb.findAll();
     const sorted = tasks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     res.json(sorted);
   } catch (error) {
@@ -14,7 +21,9 @@ exports.getAllTasks = async (req, res) => {
 // Get completed tasks
 exports.getCompletedTasks = async (req, res) => {
   try {
-    const tasks = await mockDb.findByStatus('Completed');
+    const tasks = useMongo()
+      ? await Task.find({ status: 'Completed' }).lean()
+      : await mockDb.findByStatus('Completed');
     const sorted = tasks.sort((a, b) => new Date(b.endDate) - new Date(a.endDate));
     res.json(sorted);
   } catch (error) {
@@ -25,7 +34,9 @@ exports.getCompletedTasks = async (req, res) => {
 // Get pending tasks
 exports.getPendingTasks = async (req, res) => {
   try {
-    const tasks = await mockDb.findByStatus('Pending');
+    const tasks = useMongo()
+      ? await Task.find({ status: 'Pending' }).lean()
+      : await mockDb.findByStatus('Pending');
     const sorted = tasks.sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
     res.json(sorted);
   } catch (error) {
@@ -36,7 +47,9 @@ exports.getPendingTasks = async (req, res) => {
 // Get upcoming tasks
 exports.getUpcomingTasks = async (req, res) => {
   try {
-    const tasks = await mockDb.findByStatus('Upcoming');
+    const tasks = useMongo()
+      ? await Task.find({ status: 'Upcoming' }).lean()
+      : await mockDb.findByStatus('Upcoming');
     const sorted = tasks.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     res.json(sorted);
   } catch (error) {
@@ -47,7 +60,9 @@ exports.getUpcomingTasks = async (req, res) => {
 // Get task by ID
 exports.getTaskById = async (req, res) => {
   try {
-    const task = await mockDb.findById(req.params.id);
+    const task = useMongo()
+      ? await Task.findById(req.params.id).lean()
+      : await mockDb.findById(req.params.id);
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
     }
@@ -73,7 +88,7 @@ exports.createTask = async (req, res) => {
       subtasks
     } = req.body;
 
-    const task = await mockDb.create({
+    const taskData = {
       title,
       description,
       priority,
@@ -84,7 +99,11 @@ exports.createTask = async (req, res) => {
       endTime,
       category,
       subtasks
-    });
+    };
+
+    const task = useMongo()
+      ? await Task.create(taskData)
+      : await mockDb.create(taskData);
 
     res.status(201).json(task);
   } catch (error) {
@@ -95,11 +114,6 @@ exports.createTask = async (req, res) => {
 // Update task
 exports.updateTask = async (req, res) => {
   try {
-    const task = await mockDb.findById(req.params.id);
-    if (!task) {
-      return res.status(404).json({ message: 'Task not found' });
-    }
-
     const {
       title,
       description,
@@ -125,7 +139,20 @@ exports.updateTask = async (req, res) => {
     if (category !== undefined) updates.category = category;
     if (subtasks !== undefined) updates.subtasks = subtasks;
 
-    const updatedTask = await mockDb.updateById(req.params.id, updates);
+    let updatedTask;
+    if (useMongo()) {
+      updatedTask = await Task.findByIdAndUpdate(
+        req.params.id,
+        { $set: updates },
+        { new: true, runValidators: true }
+      ).lean();
+    } else {
+      updatedTask = await mockDb.updateById(req.params.id, updates);
+    }
+
+    if (!updatedTask) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
     res.json(updatedTask);
   } catch (error) {
     res.status(400).json({ message: 'Error updating task', error: error.message });
@@ -135,7 +162,14 @@ exports.updateTask = async (req, res) => {
 // Delete task
 exports.deleteTask = async (req, res) => {
   try {
-    const success = await mockDb.deleteById(req.params.id);
+    let success = false;
+    if (useMongo()) {
+      const result = await Task.findByIdAndDelete(req.params.id);
+      success = !!result;
+    } else {
+      success = await mockDb.deleteById(req.params.id);
+    }
+
     if (!success) {
       return res.status(404).json({ message: 'Task not found' });
     }

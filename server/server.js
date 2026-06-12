@@ -1,10 +1,15 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
+const { connectDB } = require('./config/db');
 const taskRoutes = require('./routes/taskRoutes');
 
 // Load environment variables
 dotenv.config();
+
+// Connect to Database
+connectDB();
 
 // Initialize app
 const app = express();
@@ -19,6 +24,23 @@ app.use(express.json());
 
 // Routes
 app.use('/api/tasks', taskRoutes);
+
+// Serve static assets in production
+const distPath = path.join(__dirname, '../dist');
+app.use(express.static(distPath));
+
+// Fallback for SPA routing
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) {
+    return next();
+  }
+  res.sendFile(path.join(distPath, 'index.html'), (err) => {
+    if (err) {
+      // If index.html is missing (e.g. before build), pass to default handler/next
+      next();
+    }
+  });
+});
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {
