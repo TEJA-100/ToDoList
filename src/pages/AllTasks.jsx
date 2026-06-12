@@ -24,7 +24,10 @@ export default function AllTasks({ setCurrentPage }) {
       setError(null);
     } catch (err) {
       console.error(err);
-      const msg = err.response?.data?.error || err.response?.data?.message || 'Failed to fetch tasks. Please make sure the server is online.';
+      let msg = err.response?.data?.error || err.response?.data?.message || 'Failed to fetch tasks. Please make sure the server is online.';
+      if (typeof msg === 'object') {
+        msg = msg.message || JSON.stringify(msg);
+      }
       setError(msg);
     } finally {
       setLoading(false);

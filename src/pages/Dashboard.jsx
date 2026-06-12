@@ -17,7 +17,10 @@ export default function Dashboard({ setCurrentPage }) {
       setError(null);
     } catch (err) {
       console.error(err);
-      const msg = err.response?.data?.error || err.response?.data?.message || 'Failed to fetch tasks. Please ensure the backend and database are running.';
+      let msg = err.response?.data?.error || err.response?.data?.message || 'Failed to fetch tasks. Please ensure the backend and database are running.';
+      if (typeof msg === 'object') {
+        msg = msg.message || JSON.stringify(msg);
+      }
       setError(msg);
     } finally {
       setLoading(false);
