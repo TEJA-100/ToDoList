@@ -198,6 +198,6 @@ To run both client and server locally:
 
 ##  Author Information
 
-Created with ❤️ by:
+Created by:
 * **Teja Sai GUDLA**    
 * GitHub: [@TEJA-100](https://github.com/TEJA-100)
