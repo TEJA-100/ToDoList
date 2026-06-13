@@ -38,64 +38,77 @@ The application uses **React** on the frontend built with **Vite** for lightning
 - **React.js**: Library for building interactive user interfaces.
 - **Vite**: Ultra-fast next-generation frontend build tooling.
 - **Tailwind CSS**: Utility-first CSS framework for styling.
-- **Axios**: Promise-based HTTP client for API requests.
-- **Lucide React**: Sleek and modern icon library.
+
 
 ### Backend
 - **Node.js**: Cross-platform JavaScript runtime environment.
 - **Express.js**: Fast, minimalist web framework for routing.
-- **Mongoose**: Elegant MongoDB object modeling for Node.js.
-- **Cors**: Middleware to enable Cross-Origin Resource Sharing.
-- **Dotenv**: Environment variable configuration manager.
+
 
 ### Database
 - **MongoDB**: Document-oriented NoSQL database.
 
----
 
-## 4. Project Architecture
 
-TaskFlow is designed with a decoupled client-server architecture:
+## Folder Structure
 
-```mermaid
-graph TD
-    A[React SPA / Frontend] <-->|HTTP Requests / REST API| B[Express Server / Backend]
-    B <-->|Mongoose ODM| C[(MongoDB Atlas / Local MongoDB)]
-    B <-->|In-Memory Fallback| D[(Mock Local Database)]
+
+```
+├── 📁 public
+│   ├── 🖼️ favicon.svg
+│   └── 🖼️ icons.svg
+├── 📁 server
+│   ├── 📁 config
+│   │   ├── 📄 db.js
+│   │   └── 📄 mockDb.js
+│   ├── 📁 controllers
+│   │   └── 📄 taskController.js
+│   ├── 📁 models
+│   │   └── 📄 Task.js
+│   ├── 📁 routes
+│   │   └── 📄 taskRoutes.js
+│   ├── ⚙️ package-lock.json
+│   ├── ⚙️ package.json
+│   └── 📄 server.js
+├── 📁 src
+│   ├── 📁 assets
+│   │   ├── 🖼️ hero.png
+│   │   ├── 🖼️ react.svg
+│   │   └── 🖼️ vite.svg
+│   ├── 📁 components
+│   │   ├── 📄 Navbar.jsx
+│   │   ├── 📄 PriorityBadge.jsx
+│   │   ├── 📄 StatusCard.jsx
+│   │   ├── 📄 SubtaskInput.jsx
+│   │   ├── 📄 TaskCard.jsx
+│   │   └── 📄 TaskForm.jsx
+│   ├── 📁 pages
+│   │   ├── 📄 AllTasks.jsx
+│   │   ├── 📄 CreateTask.jsx
+│   │   ├── 📄 Dashboard.jsx
+│   │   ├── 📄 EditTask.jsx
+│   │   └── 📄 TaskDetails.jsx
+│   ├── 📁 services
+│   │   └── 📄 api.js
+│   ├── 🎨 App.css
+│   ├── 📄 App.jsx
+│   ├── 🎨 index.css
+│   └── 📄 main.jsx
+├── ⚙️ .gitignore
+├── 📝 README.md
+├── 📄 eslint.config.js
+├── 🌐 index.html
+├── ⚙️ package-lock.json
+├── ⚙️ package.json
+├── 📄 postcss.config.js
+├── 📄 tailwind.config.js
+└── 📄 vite.config.js
 ```
 
-* **Client Layer**: The Vite-React frontend manages state locally. API calls are consolidated inside a service wrapper using Axios.
-* **Server Layer**: The Express server exposes RESTful endpoints, parses incoming JSON payloads, handles CORS, and performs validation.
-* **Data Layer**: The backend implements a hybrid persistence pattern. If MongoDB is online (via `MONGO_URI`), Mongoose schemas store the data. If offline, the server gracefully falls back to an in-memory mock database for instant local evaluation.
-
+---
 ---
 
-## 5. Folder Structure
-
-```text
-ToList/
-├── public/                 # Static assets for the frontend
-├── src/                    # React frontend codebase
-│   ├── assets/             # SVGs and images
-│   ├── components/         # Reusable UI components (Navbar, cards, etc.)
-│   ├── pages/              # Main view screens (Dashboard, AllTasks, task creation)
-│   ├── services/           # Axios API configuration & services
-│   ├── App.jsx             # Main Application root
-│   └── main.jsx            # React entry point
-├── server/                 # Express backend codebase
-│   ├── config/             # DB connectivity and mock database fallback configuration
-│   ├── controllers/        # Request handling and business logic
-│   ├── models/             # Mongoose schemas (Task models)
-│   ├── routes/             # Express API endpoints
-│   ├── package.json        # Backend dependencies & scripts
-│   └── server.js           # Server entry point
-├── package.json            # Frontend dependencies & build configurations
-└── tailwind.config.js      # Tailwind styling configuration
-```
-
----
-
-## 6. Installation Guide
+##  Installation Guide 
 
 Ensure you have [Node.js](https://nodejs.org/) (v16+) and [MongoDB](https://www.mongodb.com/) installed on your machine.
 
@@ -107,7 +120,7 @@ cd ToDoList
 
 ---
 
-## 7. Frontend Setup Commands
+##  Frontend Setup Commands
 
 Install the frontend dependencies and launch the dev environment:
 ```bash
@@ -119,7 +132,7 @@ The React development server will start on `http://localhost:5173`.
 
 ---
 
-## 8. Backend Setup Commands
+##  Backend Setup Commands
 
 Initialize dependencies for the Express backend and launch the server:
 ```bash
@@ -132,7 +145,7 @@ The server will start on `http://localhost:5000`.
 
 ---
 
-## 9. Required NPM Packages
+##  Required NPM Packages
 
 Here are the primary packages required for each folder, along with the command to install them.
 
@@ -152,7 +165,7 @@ npm install express mongoose cors dotenv
 
 ---
 
-## 10. Environment Variables
+##  Environment Variables
 
 Create a `.env` file inside the `server/` directory to customize your server port and database connection.
 
@@ -165,7 +178,7 @@ MONGO_URI=mongodb+srv://<username>:<password>@cluster0.xxxx.mongodb.net/taskflow
 
 ---
 
-## 11. Running the Application
+##  Running the Application
 
 To run both client and server locally:
 
@@ -183,89 +196,8 @@ To run both client and server locally:
 
 ---
 
-## 12. API Endpoints
-
-All backend routes are prefixed with `/api`.
-
-| HTTP Method | Endpoint | Description |
-|---|---|---|
-| **GET** | `/api/tasks` | Retrieves all tasks |
-| **GET** | `/api/tasks/completed` | Retrieves all completed tasks |
-| **GET** | `/api/tasks/pending` | Retrieves all pending tasks |
-| **GET** | `/api/tasks/upcoming` | Retrieves all upcoming tasks |
-| **GET** | `/api/tasks/:id` | Retrieves a specific task details by ID |
-| **POST** | `/api/tasks` | Creates a new task |
-| **PUT** | `/api/tasks/:id` | Updates an existing task by ID |
-| **DELETE** | `/api/tasks/:id` | Deletes a task by ID |
-
----
-
-## 13. Database Schema Overview
-
-The MongoDB database stores tasks using the following structured Mongoose schemas:
-
-### Task Schema:
-```javascript
-{
-  title: { type: String, required: true, trim: true },
-  description: { type: String, trim: true },
-  priority: { type: String, enum: ['High', 'Medium', 'Low'], default: 'Medium' },
-  status: { type: String, enum: ['Pending', 'Completed', 'Upcoming'], default: 'Pending' },
-  startDate: { type: Date, required: true },
-  endDate: { type: Date, required: true },
-  startTime: { type: String, required: true },
-  endTime: { type: String, required: true },
-  category: { type: String, default: 'General' },
-  subtasks: [
-    {
-      title: { type: String, required: true },
-      completed: { type: Boolean, default: false }
-    }
-  ]
-}
-```
-
----
-
-## 14. Screenshots Section
-
-Add visual previews of your deployment:
-
-| Dashboard View | Search and Filters |
-| :---: | :---: |
-| ![Dashboard Mockup](https://raw.githubusercontent.com/TEJA-100/ToDoList/main/public/favicon.svg) | *Add screenshot links here* |
-
----
-
-## 15. Future Enhancements
-
-- 🔒 **User Authentication**: Add user signup, login, and JWT-based session security.
-- 🔔 **Push Notifications**: Receive alerts in-app or via email when task deadlines are approaching.
-- 📊 **Analytics Dashboard**: Add charts and graphs showing weekly/monthly task completion progress.
-- 📅 **Calendar View**: Integrate a fully interactive grid calendar (like FullCalendar) for planning.
-
----
-
-## 16. Contributing Guidelines
-
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project.
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`).
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`).
-4. Push to the Branch (`git push origin feature/AmazingFeature`).
-5. Open a Pull Request.
-
----
-
-## 17. License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
----
-
-## 18. Author Information
+##  Author Information
 
 Created with ❤️ by:
-* **Teja**
+* **Teja Sai GUDLA**    
 * GitHub: [@TEJA-100](https://github.com/TEJA-100)
